@@ -1,0 +1,4 @@
+repository "CatGame"
+  path "/"
+    br "/main"
+    co "/main"
