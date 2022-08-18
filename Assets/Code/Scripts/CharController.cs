@@ -1,69 +1,69 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CharacterController))]
 public class CharController : MonoBehaviour
 {
-    // Input fields
-    private PlayerInput playerInput;
-    private CharacterController characterController;
+    [SerializeField] private InputActionReference movementControl;
+    [SerializeField] private InputActionReference jumpControl;
+    [SerializeField] private float playerSpeed = 2.0f;
+    [SerializeField] private float jumpHeight = 1.0f;
+    [SerializeField] private float gravityValue = -9.81f;
+    [SerializeField] private float rotationSpeed = 4f;
 
-    // Variables to store player input values
-    private Vector2 currentMovementInput;
-    private Vector3 currentMovement;
-    private bool isMovementPressed;
-    private float rotationFactorPerFrame = 1.0f;
-
-    private void Awake()
-    {
-        playerInput = new PlayerInput();
-        characterController = GetComponent<CharacterController>();
-
-        playerInput.Player.Move.started += onMovementInput;
-        playerInput.Player.Move.canceled += onMovementInput;
-        playerInput.Player.Move.performed += onMovementInput;
-    }
-
-    // Handler function to set the player input values
-    private void onMovementInput(InputAction.CallbackContext context)
-    {
-        currentMovementInput = context.ReadValue<Vector2>();
-        currentMovement.x = currentMovementInput.x;
-        currentMovement.z = currentMovementInput.y;
-        isMovementPressed = currentMovementInput.x != 0 || currentMovementInput.y != 0;
-    }
-
-    private void handleRotation()
-    {
-        Vector3 positionToLookAt;
-        // the change in position our charachter should point to 
-        positionToLookAt.x = currentMovement.x;
-        positionToLookAt.y = 0.0f;
-        positionToLookAt.z = currentMovement.z;
-        // the current rotation of our character
-        Quaternion currentRotation = transform.rotation;
-
-        if (isMovementPressed)
-        {
-            // creates a new rotation based on where the player is currently pressing
-            Quaternion targetRotation = Quaternion.LookRotation(positionToLookAt);
-            transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationFactorPerFrame);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        characterController.Move(currentMovement * Time.deltaTime);
-    }
+    private CharacterController controller;
+    private Vector3 playerVelocity;
+    private bool groundedPlayer;
+    private Transform cameraMainTransform;
 
     private void OnEnable()
     {
-        playerInput.Player.Enable();
+        movementControl.action.Enable();
+        jumpControl.action.Enable();
     }
 
     private void OnDisable()
     {
-        playerInput.Player.Disable();
+        movementControl.action.Disable();
+        jumpControl.action.Disable();
+    }
+
+    private void Start()
+    {
+        controller = gameObject.GetComponent<CharacterController>();
+        cameraMainTransform = Camera.main.transform;
+    }
+
+    void Update()
+    {
+        groundedPlayer = controller.isGrounded;
+        if (groundedPlayer && playerVelocity.y < 0)
+        {
+            playerVelocity.y = 0f;
+        }
+
+        Vector2 movement = movementControl.action.ReadValue<Vector2>();
+        Vector3 move = new Vector3(movement.x, 0, movement.y);
+        move = cameraMainTransform.forward * move.z + cameraMainTransform.right * move.x;
+        move.y = 0f;
+        controller.Move(move * Time.deltaTime * playerSpeed);
+
+        // Changes the height position of the player..
+        if (jumpControl.action.triggered && groundedPlayer)
+        {
+            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+        }
+
+        //add gravity
+        playerVelocity.y += gravityValue * Time.deltaTime;
+        controller.Move(playerVelocity * Time.deltaTime);
+
+        if(movement != Vector2.zero)
+        {
+            float targetAngle = Mathf.Atan2(movement.x, movement.y) * Mathf.Rad2Deg + cameraMainTransform.eulerAngles.y;
+            Quaternion rotation = Quaternion.Euler(0f, targetAngle, 0f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
+        }
     }
 }
+

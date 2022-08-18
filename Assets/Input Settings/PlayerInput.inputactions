@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "f089d4a2-41d4-4bfa-9df2-6cba6bde1c89",
                     "expectedControlType": "Vector2",
                     "processors": "NormalizeVector2",
@@ -33,6 +33,14 @@
                     "name": "Look",
                     "type": "PassThrough",
                     "id": "5f5bd5fd-3a22-4038-9869-3d6511898e24",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Position",
+                    "type": "PassThrough",
+                    "id": "2570c112-fda5-4893-8092-302bee126f2e",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": ""
@@ -168,6 +176,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5014ff69-2d99-4d35-a07a-4aa27b68686b",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
