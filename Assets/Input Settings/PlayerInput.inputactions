@@ -39,7 +39,7 @@
                 },
                 {
                     "name": "Position",
-                    "type": "PassThrough",
+                    "type": "Value",
                     "id": "2570c112-fda5-4893-8092-302bee126f2e",
                     "expectedControlType": "Vector2",
                     "processors": "",

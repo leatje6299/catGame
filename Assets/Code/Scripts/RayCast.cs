@@ -15,22 +15,19 @@ public class RayCast : MonoBehaviour
         mainCamera = Camera.main;    
     }
 
-    private void DetectObject()
+    public void Update()
     {
         Ray ray = mainCamera.ScreenPointToRay(mousePosition.action.ReadValue<Vector2>());
         RaycastHit hit;
-        if(Physics.Raycast(ray, out hit, 200))
+        Debug.DrawLine(ray.origin, ray.direction, Color.green);
+        if (Physics.Raycast(ray, out hit, 100))
         {
-            if(hit.collider != null)
+            if (hit.collider != null)
             {
                 print(hit.collider.tag);
             }
         }
     }
+    
 
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Debug.DrawLine(transform.position, transform.forward);
-    }
 }
